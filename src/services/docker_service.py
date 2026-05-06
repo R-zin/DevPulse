@@ -59,4 +59,42 @@ class DockerService:
                 )
             )
         return result
+    def get_stats(self,container_id:str):
+        container = self.client.containers.get(container_id)
+        raw = container.stats(stream=False)
+        name = container.name.lstrip('/')
+        return ContainerStats(
+            container_id=container_id,
+            container_name=name,
+            cpu = self.parse_cpu_percent(raw),
+            memory= self.parse_memory(raw),
+            network=self.parse_network(raw),
+            timestamp=datetime.now().isoformat()
+        )
 
+    def get_logs(self,container_id:str,tail : int = 100,since : Optional[str] = None,timestamps : bool = False):
+        container = self.client.containers.get(container_id)
+        kwargs = {
+            "stdout":True,
+            "stderr":True,
+            "tail" : tail,
+            "timestamps":timestamps,
+            "stream": False
+        }
+        if since:
+            kwargs["since"] = since
+        raw_logs = container.logs(**kwargs)
+        lines = raw_logs.decode("utf-8", errors="replace").splitlines()
+        return lines
+
+    def start_container(self,container_id:str):
+        container = self.client.containers.get(container_id)
+        container.start()
+    def stop_container(self,container_id:str):
+        container = self.client.containers.get(container_id)
+        container.stop()
+    def restart_container(self,container_id:str):
+        container = self.client.containers.get(container_id)
+        container.restart()
+
+docker_service = DockerService()
