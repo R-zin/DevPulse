@@ -38,9 +38,9 @@ class DockerService:
             rx_packets=rx_packets,
             tx_packets=tx_packets,
         )
-    def list_all_containers(self):
-        containers = self.client.containers.list(all=True)
-        result = []
+    def list_all_containers(self,all=True):
+        containers = self.client.containers.list(all=all)
+        result:list(ContainerSummary) = []
         for c in containers:
             ports = {}
             for port, bindings in (c.ports or {}).items():

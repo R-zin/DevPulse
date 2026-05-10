@@ -1,1 +1,2 @@
 REDIS_URL = ""
+POLL_INTERVAL = 2
