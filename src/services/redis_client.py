@@ -5,7 +5,7 @@ from .. import Setting
 
 class RedisClient:
     def __init__(self):
-        self._client : Optional[aioredis.Redis] = None
+        self._client =aioredis.Redis
 
     async def connect(self):
         self._client = aioredis.from_url(Setting.REDIS_URL,

@@ -40,7 +40,7 @@ async def start_container(container_id:str):
 @router.post("/{container_id/stop",response_model=ActionResponse)
 async def stop_container(container_id:str,timeout:int = Query(default=10,ge=0)):
     try:
-        docker_service.stop_container(container_id)
+        docker_service.stop_container(container_id,timeout)
         return ActionResponse(container_id=container_id,
                               success=True,
                               message="Container Stopped")

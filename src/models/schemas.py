@@ -58,4 +58,6 @@ class ActionResponse(BaseModel):
     success: bool
     container_id: str
     message: str
+class set_url(BaseModel):
+    slack_url:str
 

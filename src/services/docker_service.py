@@ -90,9 +90,9 @@ class DockerService:
     def start_container(self,container_id:str):
         container = self.client.containers.get(container_id)
         container.start()
-    def stop_container(self,container_id:str):
+    def stop_container(self,container_id:str,timeout:int = 10):
         container = self.client.containers.get(container_id)
-        container.stop()
+        container.stop(timeout=timeout)
     def restart_container(self,container_id:str):
         container = self.client.containers.get(container_id)
         container.restart()
