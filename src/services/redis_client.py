@@ -1,14 +1,14 @@
 import json
 import redis.asyncio as aioredis
 from typing import Optional
-from .. import Setting
+from Setting import REDIS_URL
 
 class RedisClient:
     def __init__(self):
         self._client =aioredis.Redis
 
     async def connect(self):
-        self._client = aioredis.from_url(Setting.REDIS_URL,
+        self._client = aioredis.from_url(REDIS_URL,
                                         encoding='utf-8',
                                         decode_responses=True)
     async def disconnect(self):
