@@ -18,7 +18,7 @@ class DockerService:
     def parse_memory(self,stats:dict):
         mem = stats["memory_stats"]
         usage = mem.get("usage",0)
-        cache = mem["usage"]["cache"]
+        cache = mem["usage"]
         real_usage = usage - cache
         limit = mem.get("limit",1)
         return MemoryStats(usage_mb=round((real_usage/(1024**2)),2),

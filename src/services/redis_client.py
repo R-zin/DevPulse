@@ -1,11 +1,11 @@
 import json
 import redis.asyncio as aioredis
 from typing import Optional
-from Setting import REDIS_URL
+from ..Setting import REDIS_URL
 
 class RedisClient:
     def __init__(self):
-        self._client =aioredis.Redis
+        self._client = None
 
     async def connect(self):
         self._client = aioredis.from_url(REDIS_URL,
@@ -14,11 +14,12 @@ class RedisClient:
     async def disconnect(self):
         if self._client:
             await self._client.aclose()
+
     @property
     def client(self):
-        if not self._client():
+        if not self._client:
             raise RuntimeError("Redis not connected")
-        return self._client()
+        return self._client
 
     async def set_json(self,key:str,value:dict,ttl:int = 10):
         await self.client.set(key,json.dumps(value),ex=ttl)
