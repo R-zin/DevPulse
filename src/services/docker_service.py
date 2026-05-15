@@ -25,7 +25,7 @@ class DockerService:
                            limit_mb=round((limit/(1024**2)),2),
                            percent=round(((real_usage/limit)*100),2))
     def parse_network(self,stats:dict):
-        network = stats["network"]
+        network = stats["networks"]
         rx_bytes = tx_bytes = rx_packets = tx_packets = 0
         for i in network.values():
             rx_bytes += i.get("rx_bytes",0)
@@ -62,6 +62,7 @@ class DockerService:
     def get_stats(self,container_id:str):
         container = self.client.containers.get(container_id)
         raw = container.stats(stream=False)
+        print(raw.keys())
         name = container.name.lstrip('/')
         return ContainerStats(
             container_id=container_id,

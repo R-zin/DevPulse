@@ -12,10 +12,10 @@ async def lifespan(app:FastAPI):
 
 app = FastAPI(title="Devpulse",lifespan=lifespan)
 #app.add_middleware(CORSMiddleware,
-                 #  allow_orgins = ["http://localhost:5173"],
-                 #  allow_credentials = True,
+                 # allow_orgins = ["http://localhost:5173"],
+                  # allow_credentials = True,
                   # allow_methods = ["*"],
-                 #  allow_headers = ["*"])
+                  # allow_headers = ["*"])
 app.include_router(containers.router,prefix="/containers")
 app.include_router(alerts.router,prefix="/alert")
 app.include_router(log.router,prefix="/logs")

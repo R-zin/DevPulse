@@ -1,10 +1,10 @@
 import asyncio
 import json
 from fastapi import APIRouter,WebSocket,HTTPException,WebSocketDisconnect,Query
-from ..services.alert_service import alert_service
-from ..services.docker_service import docker_service
-from ..services.redis_client import redis_Client
-from ..Setting import POLL_INTERVAL
+from src.services.alert_service import alert_service
+from src.services.docker_service import docker_service
+from src.services.redis_client import redis_Client
+from src.Setting import POLL_INTERVAL
 
 router = APIRouter()
 
@@ -26,7 +26,7 @@ async def all_stats(websocket:WebSocket):
                 except Exception:
                     continue
             await websocket.send_text(json.dumps(payload,default=str))
-            await asyncio.sleep(setting.POLL_INTERVAL)
+            await asyncio.sleep(POLL_INTERVAL)
     except WebSocketDisconnect:
         pass
 
