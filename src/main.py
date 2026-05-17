@@ -11,15 +11,19 @@ async def lifespan(app:FastAPI):
 
 
 app = FastAPI(title="Devpulse",lifespan=lifespan)
-#app.add_middleware(CORSMiddleware,
-                 # allow_orgins = ["http://localhost:5173"],
-                  # allow_credentials = True,
-                  # allow_methods = ["*"],
-                  # allow_headers = ["*"])
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(containers.router,prefix="/containers")
 app.include_router(alerts.router,prefix="/alert")
 app.include_router(log.router,prefix="/logs")
-app.include_router(websocket.router,prefix="/soc")
+app.include_router(websocket.router)
 
 @app.get("/health")
 async def health_check():

@@ -1,12 +1,17 @@
 import docker
 import json
+from fastapi import HTTPException
 from datetime import datetime,timezone
 from typing import Optional
 from ..models.schemas import (ContainerStats,ContainerSummary,CPUStats,MemoryStats,NetworkStats)
 
 class DockerService:
     def __init__(self):
-        self.client = docker.from_env()
+        try:
+            self.client = docker.from_env()
+        except Exception as e:
+            raise HTTPException(status_code=404,detail=str(e))
+
     def parse_cpu_percent(self,stats:dict):
         cpu_delta = stats["cpu_stats"]["cpu_usage"]["total_usage"]-stats["precpu_stats"]["cpu_usage"]["total_usage"]
         system_delta = stats["cpu_stats"].get("system_cpu_usage",0) - stats["precpu_stats"].get("system_cpu_usage",0)
@@ -62,7 +67,6 @@ class DockerService:
     def get_stats(self,container_id:str):
         container = self.client.containers.get(container_id)
         raw = container.stats(stream=False)
-        print(raw.keys())
         name = container.name.lstrip('/')
         return ContainerStats(
             container_id=container_id,

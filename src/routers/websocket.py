@@ -7,6 +7,23 @@ from src.services.redis_client import redis_Client
 from src.Setting import POLL_INTERVAL
 
 router = APIRouter()
+@router.websocket("/ws/stats/{container_id}")
+async def container_stats(websocket: WebSocket,container_id: str):
+    await websocket.accept()
+    try:
+        while True:
+            stats = docker_service.get_stats(container_id)
+            await websocket.send_text(
+                json.dumps(
+                    stats.model_dump(),
+                    default=str
+                )
+            )
+            await asyncio.sleep(POLL_INTERVAL)
+    except WebSocketDisconnect:
+        pass
+
+
 
 @router.websocket("/ws/stats")
 async def all_stats(websocket:WebSocket):
