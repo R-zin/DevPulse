@@ -5,6 +5,7 @@ from ..models.schemas import ContainerStats,ContainerSummary,ActionResponse
 from ..services.redis_client import redis_Client
 import json
 
+
 router = APIRouter()
 
 @router.get("/",response_model=list[ContainerSummary])
@@ -56,4 +57,8 @@ async def restart_container(container_id):
                               message="Container restarted Successfully")
     except Exception as e:
         return HTTPException(status_code=500,detail={e})
+
+@router.get("/{container_id/log_report/)
+async def generate_log_report(container_id:str):
+
 
