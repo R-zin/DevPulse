@@ -13,7 +13,7 @@ async def list_containers(all:bool = Query(default=True)): #Include Stopped cont
     try:
         return docker_service.list_all_containers()
     except Exception as e:
-        return HTTPException(status_code=500,detail="Error while fetching")
+        raise HTTPException(status_code=500,detail="Error while fetching")
 
 @router.get("/{container_id}/stats",response_model=ContainerStats)
 async def get_container_stats(container_id:str):
@@ -23,7 +23,7 @@ async def get_container_stats(container_id:str):
     try:
         stats = docker_service.get_stats(container_id)
     except docker.errors.NotFound:
-        return HTTPException(status_code=404,detail="Container Not Found")
+        raise HTTPException(status_code=404,detail="Container Not Found")
     await redis_Client.cache_stats(container_id,stats.model_dump_json())
 
     return stats
@@ -36,9 +36,9 @@ async def start_container(container_id:str):
                               success=True,
                               message="Container turned on successfully")
     except Exception as e:
-        return HTTPException(status_code=500,detail={e})
+        raise HTTPException(status_code=500,detail={e})
 
-@router.post("/{container_id/stop",response_model=ActionResponse)
+@router.post("/{container_id}/stop",response_model=ActionResponse)
 async def stop_container(container_id:str,timeout:int = Query(default=10,ge=0)):
     try:
         docker_service.stop_container(container_id,timeout)
@@ -46,7 +46,7 @@ async def stop_container(container_id:str,timeout:int = Query(default=10,ge=0)):
                               success=True,
                               message="Container Stopped")
     except Exception as e:
-        return HTTPException(status_code=500,detail={e})
+        raise HTTPException(status_code=500,detail={e})
 
 @router.post("/{container_id}/restart",response_model=ActionResponse)
 async def restart_container(container_id):
@@ -56,9 +56,17 @@ async def restart_container(container_id):
                               success=True,
                               message="Container restarted Successfully")
     except Exception as e:
-        return HTTPException(status_code=500,detail={e})
+        raise HTTPException(status_code=500,detail=str(e))
 
-@router.get("/{container_id/log_report/)
+@router.get("/{container_id}/tester_getinstant")
+async def tester(container_id:str):
+    try:
+        res = docker_service.get_raw_data(container_id)
+        return res
+    except Exception as e:
+        raise HTTPException(status_code=500,detail=str(e))
+@router.get("/{container_id}/log_report/")
 async def generate_log_report(container_id:str):
+    pass
 
 

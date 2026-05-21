@@ -35,12 +35,13 @@ async def all_stats(websocket:WebSocket):
             for c in containers:
                 try:
                     stats = docker_service.get_stats(c.id)
-                    await alert_service.check_and_fire(stats)
-                    await redis_Client.cache_stats(c.short_id, stats.model_dump())
+                    #await alert_service.check_and_fire(stats)
+                    #await redis_Client.cache_stats(c.short_id, stats.model_dump())
                     data = stats.model_dump()
                     payload["containers"].append(data)
                     payload["timestamp"] = data["timestamp"]
-                except Exception:
+                except Exception as e:
+                    print(str(e))
                     continue
             await websocket.send_text(json.dumps(payload,default=str))
             await asyncio.sleep(POLL_INTERVAL)

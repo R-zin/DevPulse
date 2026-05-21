@@ -15,7 +15,7 @@ class DockerService:
     def parse_cpu_percent(self,stats:dict):
         cpu_delta = stats["cpu_stats"]["cpu_usage"]["total_usage"]-stats["precpu_stats"]["cpu_usage"]["total_usage"]
         system_delta = stats["cpu_stats"].get("system_cpu_usage",0) - stats["precpu_stats"].get("system_cpu_usage",0)
-        online_cpus = stats["cpu_stats"].get("online_cpu",len(stats["cpu_stats"]["cpu_usage"].get("percpu_usage",[1])))
+        online_cpus = stats["cpu_stats"].get("online_cpus",len(stats["cpu_stats"]["cpu_usage"].get("percpu_usage",[1])))
         percent = 0.0
         if system_delta > 0:
             percent = (cpu_delta/system_delta)*online_cpus*100.0
@@ -91,7 +91,9 @@ class DockerService:
         raw_logs = container.logs(**kwargs)
         lines = raw_logs.decode("utf-8", errors="replace").splitlines()
         return lines
-
+    def get_raw_data(self,container_id:str):
+        data = self.client.containers.get(container_id)
+        return data.stats(stream=False)
     def start_container(self,container_id:str):
         container = self.client.containers.get(container_id)
         container.start()
