@@ -1,7 +1,7 @@
 import docker.errors
 from fastapi import APIRouter,HTTPException,Query
 from ..services.docker_service import docker_service
-from ..models.schemas import ContainerStats,ContainerSummary,ActionResponse
+from ..models.schemas import ContainerStats,ContainerSummary,ActionResponse,renameIn
 from ..services.redis_client import redis_Client
 import json
 
@@ -65,8 +65,19 @@ async def tester(container_id:str):
         return res
     except Exception as e:
         raise HTTPException(status_code=500,detail=str(e))
-@router.get("/{container_id}/log_report/")
+@router.get("/{container_id}/generate_report")
 async def generate_log_report(container_id:str):
     pass
+
+@router.post("/rename")
+async def rename(data:renameIn):
+    try:
+        docker_service.change_container_name(data.container_id,data.new_name)
+        return {"Message":f"Container renamed successfully to {data.new_name}"}
+    except Exception as e:
+        raise HTTPException(status_code=500,detail=str(e))
+
+
+
 
 

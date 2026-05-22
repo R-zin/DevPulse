@@ -5,6 +5,9 @@ from datetime import datetime,timezone
 from typing import Optional
 from ..models.schemas import (ContainerStats,ContainerSummary,CPUStats,MemoryStats,NetworkStats)
 
+#Next feature: Integration of logging into Database
+
+
 class DockerService:
     def __init__(self):
         try:
@@ -14,17 +17,15 @@ class DockerService:
 
     def parse_cpu_percent(self,stats:dict):
         cpu_delta = stats["cpu_stats"]["cpu_usage"]["total_usage"]-stats["precpu_stats"]["cpu_usage"]["total_usage"]
-        system_delta = stats["cpu_stats"].get("system_cpu_usage",0) - stats["precpu_stats"].get("system_cpu_usage",0)
-        online_cpus = stats["cpu_stats"].get("online_cpus",len(stats["cpu_stats"]["cpu_usage"].get("percpu_usage",[1])))
+        system_delta = stats["cpu_stats"]["system_cpu_usage"] - stats["precpu_stats"]["system_cpu_usage"]
+        online_cpus = stats["cpu_stats"]["online_cpus"]
         percent = 0.0
         if system_delta > 0:
             percent = (cpu_delta/system_delta)*online_cpus*100.0
         return CPUStats(percent=round(percent,2),system_cpu_usage=stats["cpu_stats"].get("system_cpu_usage",0),online_cpu=online_cpus)
     def parse_memory(self,stats:dict):
         mem = stats["memory_stats"]
-        usage = mem.get("usage",0)
-        cache = mem["usage"]
-        real_usage = usage - cache
+        real_usage = mem["usage"]
         limit = mem.get("limit",1)
         return MemoryStats(usage_mb=round((real_usage/(1024**2)),2),
                            limit_mb=round((limit/(1024**2)),2),
@@ -76,6 +77,10 @@ class DockerService:
             network=self.parse_network(raw),
             timestamp=datetime.now().isoformat()
         )
+    def change_container_name(self,container_id:str,new_name:str):
+        container = self.client.containers.get(container_id)
+        container.rename(new_name)
+
 
     def get_logs(self,container_id:str,tail : int = 100,since : Optional[str] = None,timestamps : bool = False):
         container = self.client.containers.get(container_id)

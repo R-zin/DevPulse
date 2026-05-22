@@ -60,4 +60,7 @@ class ActionResponse(BaseModel):
     message: str
 class set_url(BaseModel):
     slack_url:str
+class renameIn(BaseModel):
+    container_id:str
+    new_name:str
 
