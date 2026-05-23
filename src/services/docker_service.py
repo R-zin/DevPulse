@@ -4,16 +4,34 @@ from fastapi import HTTPException
 from datetime import datetime,timezone
 from typing import Optional
 from ..models.schemas import (ContainerStats,ContainerSummary,CPUStats,MemoryStats,NetworkStats)
+from .connection import AsyncSessionLocal
+from ..models.DBSchema import ContainerMetrics
 
 #Next feature: Integration of logging into Database
 
 
 class DockerService:
-    def __init__(self):
+    def __init__(self,interval:int = 10):
+        self.interval = interval
+        self.running = False
         try:
             self.client = docker.from_env()
         except Exception as e:
             raise HTTPException(status_code=404,detail=str(e))
+    async def start(self):
+        self.running = True
+        while self.running:
+            pass
+    async def stop(self):
+        self.running = False
+    async def collect_and_store(self):
+        containers = self.list_all_containers()
+        metrics_batch = []
+        for c in containers:
+            stats = self.get_stats(c.id)
+            metrics_batch.append()
+
+
 
     def parse_cpu_percent(self,stats:dict):
         cpu_delta = stats["cpu_stats"]["cpu_usage"]["total_usage"]-stats["precpu_stats"]["cpu_usage"]["total_usage"]
