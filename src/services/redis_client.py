@@ -20,6 +20,15 @@ class RedisClient:
         if not self._client:
             raise RuntimeError("Redis not connected")
         return self._client
+    async def enqueue(self,queue:str,data:dict):
+        await self.client.rpush(queue,json.dumps(data))
+    async def dequeue(self,queue:str,timeout:int = 0):
+        data = await self.client.blpop(queue,timeout)
+        if data:
+            _,value = data
+            return json.loads(value)
+        return None
+
 
     async def set_json(self,key:str,value:dict,ttl:int = 10):
         await self.client.set(key,json.dumps(value),ex=ttl)
