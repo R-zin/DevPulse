@@ -14,7 +14,8 @@ class DockerService:
             self.client = docker.from_env()
         except Exception as e:
             raise HTTPException(status_code=404,detail=str(e))
-
+    def health_check(self):
+        return self.client.ping()
     def parse_cpu_percent(self,stats:dict):
         cpu_delta = stats["cpu_stats"]["cpu_usage"]["total_usage"]-stats["precpu_stats"]["cpu_usage"]["total_usage"]
         system_delta = stats["cpu_stats"]["system_cpu_usage"] - stats["precpu_stats"]["system_cpu_usage"]

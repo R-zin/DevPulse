@@ -14,13 +14,13 @@ class RedisClient:
     async def disconnect(self):
         if self._client:
             await self._client.aclose()
-
     @property
     def client(self):
         if not self._client:
             raise RuntimeError("Redis not connected")
         return self._client
-
+    async def check_health(self):
+        return await self.client.ping()
     async def set_json(self,key:str,value:dict,ttl:int = 10):
         await self.client.set(key,json.dumps(value),ex=ttl)
     async def get_json(self,key:str):
@@ -30,7 +30,6 @@ class RedisClient:
         await self.client.delete(key)
     async def publish(self,channel:str,message:dict):
         await self.client.publish(channel,json.dumps(message))
-
     async def get_alert_config(self) -> Optional[dict]:
         return await self.get_json("devpulse:alert_config")
 
